@@ -11,36 +11,40 @@ class TransmissionWatcher:
 
     def __init__(self, local_dir, nas_dir,
                  transmission_auth_file, nas_smb_auth_file,
-                 logging_file, logging_level=logging.INFO) -> None:
-        """_summary_
+                 log_file, logging_level=logging.INFO) -> None:
+        """Constructor of the TransmissionWatcher object.
 
-        :param local_dir: _description_
-        :type local_dir: _type_
-        :param nas_dir: _description_
-        :type nas_dir: _type_
-        :param transmission_auth_file: _description_
-        :type transmission_auth_file: _type_
-        :param nas_smb_auth_file: _description_
-        :type nas_smb_auth_file: _type_
-        :param logging_file: _description_
-        :type logging_file: _type_
-        :param logging_level: _description_
-        :type logging_level: _type_
+        :param local_dir:
+            Path to the local dir where Transmission puts the completed
+            downloads.
+        :type local_dir: string
+        :param nas_dir:
+            Path to the remote directory where the downloaded content is
+            stored.
+        :type nas_dir: string
+        :param transmission_auth_file:
+            Path to the file that stores the Transmission credentials.
+        :type transmission_auth_file: string
+        :param nas_smb_auth_file:
+            Path to the file that stores the remote (NAS) SMB credentials.
+        :type nas_smb_auth_file: string
+        :param log_file: Path to the log file.
+        :type log_file: string
+        :param logging_level: The logging level, defaults to logging.INFO.
+        :type logging_level: integer
         """
         self._local_dir = local_dir
         self._nas_dir = nas_dir
         self._transmission_auth_file = transmission_auth_file
         self._nas_smb_auth_file = nas_smb_auth_file
-        self._logging_file = logging_file
-        self._logging_level = logging_level
+        self._logger = logging.getLogger(__name__)
         self._database = None
 
-        logging.basicConfig(filename=self._logging_file,
-                            level=self._logging_level,
-                            format='%(asctime)s %(message)s')
+        logging.basicConfig(filename=log_file, level=logging_level,
+                            format='%(asctime)s [%(levelname)s] %(message)s')
 
-        logging.info("***")
-        logging.info("Starting Transmission Watcher Service...")
+        self._logger.info("***")
+        self._logger.info("Starting Transmission Watcher Service...")
 
     def run(self) -> None:
         """This watcher function ensures that completed torrents are copied to
@@ -79,14 +83,14 @@ class TransmissionWatcher:
         # Get the actual completed torrent list from daemon
         daemon_completed_list = self._get_completed_torrents()
         if daemon_completed_list is None:
-            logging.error("Cannot access transmission daemon.")
+            self._logger.error("Cannot access transmission daemon.")
             return
 
         # If the database does not exist (i.e. upon first execution):
         # Create database based on the current list of completed torrents
         if self._database is None:
-            logging.info("Database is created from completed list of torrents "
-                         "of daemon.")
+            self._logger.info("Database is created from completed list of "
+                              "torrents of daemon.")
             self._database = daemon_completed_list
 
         # Delete all torrents from database that are not in the completed list
@@ -149,7 +153,7 @@ class TransmissionWatcher:
                 # and (2) all files that are not matching (e.g. a previous copy
                 # had been interrupted) will be copied. Thus, rsync will
                 # effectively copy only the required files.
-                logging.info("Updating: %s", torrent['name'])
+                self._logger.info("Updating: %s", torrent['name'])
                 torrent_path_nas = os.path.join(self._nas_dir, torrent['name'])
                 time_copy_begin = time.time()
                 torrent_source = torrent_path_local + "/" if os.path.isdir(
@@ -159,14 +163,14 @@ class TransmissionWatcher:
                         torrent_source, torrent_path_nas],
                     capture_output=True, check=False, text=True)
                 if result.returncode != 0:
-                    logging.error("Failed to rsync torrent: %s",
-                                  torrent['name'])
+                    self._logger.error("Failed to rsync torrent: %s",
+                                       torrent['name'])
                 else:
                     time_copy_end = time.time()
                     torrent['copied'] = True
                     elapsed_s = round(time_copy_end - time_copy_begin)
                     duration = str(datetime.timedelta(seconds=elapsed_s))
-                    logging.info(
+                    self._logger.info(
                         "Updating done. Size: %s %s, Duration: %s",
                         torrent['have_size'], torrent['have_unit'], duration)
 
@@ -177,7 +181,7 @@ class TransmissionWatcher:
                     torrent['date_finished'], "%a %b %d %H:%M:%S %Y")
                 finished_days = (datetime.datetime.now() - finished_date).days
                 if finished_days > 30:
-                    logging.info("Removing: %s", torrent['name'])
+                    self._logger.info("Removing: %s", torrent['name'])
                     torrent_id = self._get_torrent_id_based_on_hash(
                         torrent['hash'])
                     if torrent_id is not None:
@@ -278,7 +282,7 @@ class TransmissionWatcher:
             ["transmission-remote", "-N", self._transmission_auth_file, "-l"],
             capture_output=True, check=False, text=True)
         if result.returncode != 0:
-            logging.error(result.stderr)
+            self._logger.error(result.stderr)
             return None
 
         completed_torrent_list = []
@@ -362,11 +366,11 @@ class TransmissionWatcher:
                 ["mount", self._nas_dir],
                 capture_output=True, check=False, text=True)
             if result.returncode != 0:
-                logging.error("NAS SMB share could not be mounted.")
-                logging.error(result.stderr)
+                self._logger.error("NAS SMB share could not be mounted.")
+                self._logger.error(result.stderr)
                 is_mounted = False
             else:
-                logging.info("NAS SMB share is successfully mounted.")
+                self._logger.info("NAS SMB share is successfully mounted.")
                 is_mounted = True
                 is_mount_executed = True
 
@@ -386,10 +390,10 @@ class TransmissionWatcher:
                 ["umount", self._nas_dir],
                 capture_output=True, check=False, text=True)
             if result.returncode != 0:
-                logging.error("NAS SMB share could not be unmounted.")
-                logging.error(result.stderr)
+                self._logger.error("NAS SMB share could not be unmounted.")
+                self._logger.error(result.stderr)
             else:
-                logging.info("NAS SMB share is successfully unmounted.")
+                self._logger.info("NAS SMB share is successfully unmounted.")
                 return True
 
         return False
