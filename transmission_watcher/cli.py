@@ -8,7 +8,7 @@ LOCAL_DIR = "/mnt/exthd/Media"
 NAS_DIR = "/mnt/nas/Media"
 TRANSMISSION_AUTH = "/home/pi/.transmission_credentials"
 NAS_SMB_AUTH = "/home/pi/.smb_credentials"
-LOGGING_FILE = "/home/pi/transmission_watcher.log"
+LOG_FILE = "/home/pi/transmission_watcher.log"
 RUN_PERIOD = 5
 
 
@@ -41,7 +41,7 @@ def main():
 
     parser.add_argument(
         "--log-file",
-        default=LOGGING_FILE,
+        default=LOG_FILE,
         help="path to the log file")
 
     parser.add_argument(
