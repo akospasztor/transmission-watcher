@@ -2,7 +2,7 @@
 
 import argparse
 import time
-from transmission_watcher import TransmissionWatcher
+from .transmission_watcher import TransmissionWatcher
 
 LOCAL_DIR = "/mnt/exthd/Media"
 NAS_DIR = "/mnt/nas/Media"
