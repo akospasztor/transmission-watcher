@@ -13,7 +13,9 @@ install_requires = [
 extras_require = {
     'test': [
         'setuptools',
+        'editorconfig-checker~=3.2.0',
         'flake8~=7.1.2',
+        'yamllint~=1.36.0',
         'pytest~=8.3.5',
         'pytest-cov~=6.0.0',
         'pytest-html~=4.1.1',
