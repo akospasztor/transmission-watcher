@@ -1,5 +1,17 @@
 # Transmission Watcher
 
+This python package allows to automatically synchronize completed downloads from
+a Transmission client to a Network Attached Storage (NAS) via SMB.
+
+Major features:
+
+- Copies data only when it's needed to avoid unnecessary copy operations
+- Designed to prevent data loss, resilient against script/service interruptions,
+  restarts, manual deletions, etc.
+- Automatically deletes downloads older than 30 days from the Transmission
+  client
+- Can be installed as a service to ensure automatic operation
+
 ## Install
 
 **Note:** Recommended usage is within a virtualenv.
