@@ -7,21 +7,16 @@ python_requires = '>=3.7, <4'
 
 # Packages that this package imports
 install_requires = [
-    # <insert list of packages and versions here>
 ]
 
 # Packages required for tests and docs
 extras_require = {
     'test': [
+        'setuptools',
         'flake8~=7.1.2',
         'pytest~=8.3.5',
         'pytest-cov~=6.0.0',
         'pytest-html~=4.1.1',
-    ],
-    'docs': [
-        'docutils~=0.17.1',
-        'sphinx~=2.2.1',
-        'sphinx-rtd-theme~=0.4.3',
     ]
 }
 
@@ -57,7 +52,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
     entry_points={
-        'console_scripts': ['transmission-watcher ='
-                            'transmission_watcher.cli:main'],
+        'console_scripts': [
+            'transmission-watcher = transmission_watcher.cli:main'],
     },
 )

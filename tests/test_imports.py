@@ -7,14 +7,12 @@ import pytest
 import re
 from setuptools import find_packages
 
-EXCLUDES = []  # Regex: remember to use \. !
-
-
-root_path = os.path.join(os.path.dirname(__file__), "..")
+ROOT_PATH = os.path.join(os.path.dirname(__file__), "..")
+EXCLUDES = []  # regex format
 
 
 @pytest.mark.parametrize("package",
-                         find_packages(where=root_path,
+                         find_packages(where=ROOT_PATH,
                                        exclude=['tests', 'tests.*']))
 def test_import(package):
     """Test if all (sub-)packages can be imported."""
