@@ -5,21 +5,15 @@
 **Note:** Recommended usage is within a virtualenv.
 
 ```shell
-pip install -e ."
-```
-
-```shell
-pip install -e ".[test,docs]"
+pip install -e .
 ```
 
 ## Usage
 
-```shell
-transmission-watcher --help
-```
+Refer to the command line interface help for the usage and available options:
 
 ```shell
-pytest -v -ra --junit-xml=tests/report/report.xml --html=tests/report/report.html --self-contained-html
+transmission-watcher --help
 ```
 
 ## Run as a service
@@ -64,3 +58,23 @@ Start service:
 sudo systemctl start transmission-watcher
 ```
 
+## Development & Testing
+
+Install the package with the required extra packages for development and
+testing:
+
+```shell
+pip install -e ".[test]"
+```
+
+### Run the tests
+
+```shell
+pytest -ra --junit-xml=tests/build/report.xml --html=tests/build/report.html --self-contained-html
+```
+
+Notes:
+
+- Add the `-v` flag for additional (verbose) output.
+- Add the `-s` flag to disable all output capturing (useful for immediately
+  displaying `print` outputs).
