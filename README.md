@@ -16,7 +16,16 @@ Major features:
 
 **Note:** Recommended usage is within a virtualenv.
 
+Install directly from GitHub:
+
 ```shell
+pip install git+https://github.com/akospasztor/transmission-watcher
+```
+
+Alternatively, you can clone this repository and install the package:
+
+```shell
+cd transmission-watcher
 pip install -e .
 ```
 
